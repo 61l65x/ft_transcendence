@@ -1,17 +1,14 @@
 # livechat/consumers.py
-import json
 from channels.generic.websocket import AsyncWebsocketConsumer
-import logging
-
-logger = logging.getLogger(__name__)
+import json
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.room_name = "general"
+        # Perform WebSocket handshake and accept the connection
+        self.room_name = "chat"
         self.room_group_name = f"chat_{self.room_name}"
 
-        logger.debug(f"Connecting to room: {self.room_group_name}")
-
+        # Join the chat room group
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
@@ -20,17 +17,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def disconnect(self, close_code):
-        logger.debug(f"Disconnecting from room: {self.room_group_name}")
+        # Leave the chat room group
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
         )
 
+    # Receive message from WebSocket
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
-        logger.debug(f"Received message: {message}")
 
+        # Send message to WebSocket group
         await self.channel_layer.group_send(
             self.room_group_name,
             {
@@ -39,10 +37,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }
         )
 
+    # Receive message from WebSocket group
     async def chat_message(self, event):
         message = event['message']
-        logger.debug(f"Sending message: {message}")
 
+        # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'message': message
         }))

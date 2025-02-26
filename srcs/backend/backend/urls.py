@@ -20,6 +20,7 @@ from django.urls import path, include, re_path
 from django.conf import settings
 from django.views.static import serve
 from . import views
+from livechat import consumers 
 
 handler404 = "backend.views.custom_404"
 handler500 = "backend.views.custom_500"
@@ -32,4 +33,8 @@ urlpatterns = [
     path("tournaments/", include("tournaments.urls")),
     path("get-csrf-token/", views.get_csrf_token),
     path("", views.homepage),
+
+    ## livechat
+    re_path(r'ws/chat/', consumers.ChatConsumer),
+
 ]

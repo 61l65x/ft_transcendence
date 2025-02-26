@@ -1,6 +1,5 @@
-# livechat/models.py
+from django.conf import settings
 from django.db import models
-from django.contrib.auth.models import User
 
 # Optional: You could create a ChatRoom model to separate chats into different rooms
 class ChatRoom(models.Model):
@@ -12,7 +11,7 @@ class ChatRoom(models.Model):
 
 # The Message model will store messages sent by users
 class Message(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Linking the message to a user
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # Use AUTH_USER_MODEL instead of User
     room = models.ForeignKey(ChatRoom, on_delete=models.CASCADE, related_name='messages')  # Linking to a room (optional)
     content = models.TextField()  # The content of the message
     timestamp = models.DateTimeField(auto_now_add=True)  # Timestamp for when the message was created

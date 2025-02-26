@@ -36,9 +36,11 @@ INSTALLED_APPS = [
     "users",
     "tournaments",
     "games",
+    "livechat",
     # Third-party apps
     "axes",
     "corsheaders",
+    "channels",
     # Default Django apps
     "django.contrib.admin",
     "django.contrib.auth",
@@ -50,6 +52,7 @@ INSTALLED_APPS = [
 
 
 MIDDLEWARE = [
+    "livechat.middleware.WebSocketMiddleware", 
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -116,6 +119,22 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
+
+ASGI_APPLICATION = 'backend.asgi.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
+# Add Redis later
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+#         'CONFIG': {
+#             "hosts": [('127.0.0.1', 6379)],  # Make sure Redis is running or adjust accordingly
+#         },
+#     },
+# }
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
