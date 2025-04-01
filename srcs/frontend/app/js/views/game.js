@@ -15,9 +15,11 @@ const setupGameJs = async () => {
         } else if (type === "local") {
             switch (mode) {
                 case "tournament":
-                    response = await apiRequest(`users/${userId}/games/local/`, 'POST');
-                    if (response.error) { throw new Error(response.error); }
-                    initializeTournament(response.game_id);
+                    try {
+                        initializeTournament();
+                    } catch (error) {
+                        console.error("Tournament error in setup:", error);
+                    }
                     break;
                 case "1v1":
                     response = await apiRequest(`users/${userId}/games/local/`, 'POST');
@@ -26,12 +28,14 @@ const setupGameJs = async () => {
                     break;
                 case "ai":
                     response = await apiRequest(`users/${userId}/games/ai/`, 'POST');
-                    if (response.error) { throw new Error(response.error);}
+                    if (response.error) { throw new Error(response.error); }
                     initializeAIGame(response.game_id);
                     break;
                 default:
                     console.error(`❌ Unknown game mode: ${mode}`);
-                    initializeGame(response.game_id);
+                    if (response?.game_id) {
+                        initializeGame(response.game_id);
+                    }
             }
         } else {
             console.error(`❌ Unknown game type: ${type}`);

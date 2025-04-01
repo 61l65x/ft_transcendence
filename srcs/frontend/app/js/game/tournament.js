@@ -1,4 +1,30 @@
-const setupTournament = () => {
+const setupTournament = async () => {
+
+
+    const userId = localStorage.getItem("user_id");
+    const tournamentName = prompt("Please enter the tournament name:");
+    const displayName = prompt("Please enter your display name in tournament:");
+    let   response = null;
+ 
+    if (!tournamentName || !displayName) {
+        alert("Both tournament name and display name are required.");
+        throw new Error("Tournament name and display name are required.");
+    }
+
+    const body = {
+        tournament_name: tournamentName,
+        display_name: displayName,
+    };
+
+    response = await apiRequest(`tournaments/?user_id=${userId}`, 'POST', body);
+    if (response.error) {
+        alert("Error starting tournament: " + response.error);
+        return null;
+    }
+    const tournamentId = response.tournament_id;
+
+
+
     const numberOfPlayers = parseInt(prompt("Enter the number of players:"));
     if (isNaN(numberOfPlayers) || numberOfPlayers <= 0) {
         alert("Invalid number of players. Please enter a positive integer.");
@@ -10,6 +36,7 @@ const setupTournament = () => {
         const playerName = prompt(`Enter the name of player ${i + 1}:`);
         if (playerName) {
             players.push({ name: playerName, score: 0, matches: 0 });
+            response = await apiRequest(`tournaments/${tournamentId}/players/?user_id=${userId}`, 'PATCH', { display_name: playerName });
         } else {
             alert("Player name cannot be empty. Please enter a valid name.");
             i--; // Retry for the same player index
@@ -21,18 +48,23 @@ const setupTournament = () => {
         alert("Invalid winning score. Please enter a positive integer.");
         return null;
     }
+    response = await apiRequest(`tournaments/${tournamentId}/start/?user_id=${userId}`, 'PATCH');
+    if (response.error) {
+        alert("Error starting tournament: " + response.error);
+        return null;
+    }
 
     console.log("Tournament initialized with players:", players);
     return { players, winningScore, keyboardEnter: false, state: 'table' };
 };
 
-const initializeTournament = (gameId) => {
+const initializeTournament = async () => {
     const canvas = document.getElementById('pong');
     if (!canvas) {
         console.error("Canvas element '#pong' not found.");
         return;
     }
-    const tournament = setupTournament();
+    const tournament = await setupTournament();
     if (!tournament) return;
     const game = createGame();
     game.winningScore = tournament.winningScore;
