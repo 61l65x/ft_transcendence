@@ -11,20 +11,25 @@
     position: relative;
     display: inline-block;
     margin-bottom: 25px;
-}.avatar-upload-label {
+}.avatar-upload-label, .avatar-reset-btn {
     position: absolute;
-    top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: rgba(0, 0, 0, 0.7);
     color: white;
-    padding: 10px 20px;
+    padding: 8px 16px;
     border-radius: 5px;
-    font-size: 16px;
+    font-size: 14px;
     cursor: pointer;
     opacity: 0;
     transition: opacity 0.3s ease;
-}.avatar-container:hover .avatar-upload-label {
+    text-align: center;
+}.avatar-upload-label {
+    top: 40%;
+}.avatar-reset-btn {
+    top: 60%;
+}.avatar-container:hover .avatar-upload-label,
+.avatar-container:hover .avatar-reset-btn {
     opacity: 1;
 }.avatar-container:hover .profile-avatar {
     opacity: 0.8;
@@ -37,6 +42,10 @@
 }
 
 /* Profile Container */
+.profile-dropdown {
+    position: relative;
+    display: inline-block;
+  }
 .profile-container {
     overflow-y: auto; /* Enable vertical scrolling */
     display: flex;
@@ -222,6 +231,7 @@
 #profile-logout-btn,
 .delete-account-btn,
 .deactivate-account-btn,
+.anonymize-personal-data-btn,
 #edit-profile-btn,
 #save-profile-btn,
 #save-password-btn,
@@ -248,6 +258,7 @@
 #profile-logout-btn:hover,
 .delete-account-btn:hover,
 .deactivate-account-btn:hover,
+.anonymize-personal-data-btn:hover,
 #edit-profile-btn:hover,
 #save-profile-btn:hover,
 #save-password-btn:hover,
@@ -275,12 +286,14 @@
     background-color: var(--link-hover-color);
 }
 
+.anonymize-personal-data-btn,
 .deactivate-account-btn,
 .delete-account-btn {
     background-color: #f44336;
     color: white;
 }
 
+.anonymize-personal-data-btn:hover,
 .deactivate-account-btn:hover,
 .delete-account-btn:hover {
     background-color: #d32f2f;

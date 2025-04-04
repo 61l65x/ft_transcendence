@@ -272,27 +272,53 @@ def update_password(request, user_id):
 
 
 @custom_login_required
-@require_POST
-def update_avatar(request, user_id):
-    if "avatar" not in request.FILES:
-        return JsonResponse({"errors": "No file uploaded."}, status=400)
-
+@require_http_methods(["POST", "DELETE"])
+def handle_avatar(request, user_id):
     user = User.objects.get(id=user_id)
-    old_file_path = user.avatar.name  # Store old file path for cleanup
-    form = AvatarUpdateForm(request.POST, request.FILES, instance=user)
 
-    if form.is_valid():
-        user.update_avatar(form.cleaned_data.get("avatar"), old_file_path)
+    if request.method == "POST":
+        if "avatar" not in request.FILES:
+            return JsonResponse({"errors": "No file uploaded."}, status=400)
+
+        old_file_path = user.avatar.name  # Store old file path for cleanup
+        form = AvatarUpdateForm(request.POST, request.FILES, instance=user)
+
+        if form.is_valid():
+            user.update_avatar(form.cleaned_data.get("avatar"), old_file_path)
+            return JsonResponse(
+                {
+                    "id": user.id,
+                    "username": user.username,
+                    "message": "Avatar updated.",
+                    "avatar_url": user.get_avatar(),
+                }
+            )
+        return JsonResponse({"errors": form.errors}, status=400)
+    elif request.method == "DELETE":
+        user.reset_avatar()
         return JsonResponse(
             {
                 "id": user.id,
                 "username": user.username,
-                "message": "Avatar updated.",
+                "message": "Avatar reset.",
                 "avatar_url": user.get_avatar(),
             }
         )
 
-    return JsonResponse({"errors": form.errors}, status=400)
+
+@custom_login_required
+@require_http_methods(["PATCH"])
+def anonymize_user(request, user_id):
+    user = User.objects.get(id=user_id)
+
+    if user.is_anonymized:
+        return JsonResponse({"errors": "User is already anonymized."}, status=400)
+
+    user.anonymize()
+    response = JsonResponse(
+        {"message": "Your data has been anonymized. Logging out..."}
+    )
+    return custom_logout(request, user_id, response)
 
 
 @custom_login_required

@@ -175,6 +175,32 @@ Allow users to upload a new avatar image.
 
 ---
 
+### User avatar reset
+
+Allow users to reset their avatar to default one.
+
+<details>
+    <summary><code>DELETE</code><code><b>users/{user_id}/avatar/</b></code></summary>
+
+- **Response**
+    - **200**
+      ```json
+        {
+            "id": 1,
+            "username": "user1",
+            "message": "Avatar reset.",
+            "avatar_url": "/static/avatars/default.png"
+        }
+        ```
+    - **401**
+        ```json
+        {"errors": "User is not authenticated."}
+        ```
+
+</details>
+
+---
+
 ### User profile info
 
 Get details of the authenticated user's profile.
@@ -331,6 +357,35 @@ For the authenticated user to delete its account. In this case, user object and 
             "username": "user1",
             "message": "Account deleted."
         }
+        ```
+    - **401**
+        ```json
+        {"errors": "User is not authenticated."}
+        ```
+
+</details>
+
+---
+
+### Anonymization
+
+Enable users to request anonymization of their personal data, ensuring that their identity and sensitive information are protected. The following actions are taken upon a successful request:
+- username and email anonymized;
+- first and last names become empty strings;
+- avatar reset to default and existing avatar deleted if it exists;
+- friends removed;
+- user is logged out and may not log in again.
+
+<details>
+    <summary><code>PATCH</code><code><b>users/{user_id}/anonymize/</b></code></summary>
+
+- **Response** 
+    - **200**
+        ```json
+        {"message": "Your data has been anonymized. Logging out..."}
+    - **400**
+        ```json
+        {"errors": "User is already anonymized."}
         ```
     - **401**
         ```json

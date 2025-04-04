@@ -3,8 +3,11 @@
     <!-- Existing profile content -->
     <div class="avatar-container">
         <img class="profile-avatar" alt="Player Avatar" onerror="this.src='/static/avatars/default.png'">
+        <!-- Upload avatar -->
         <label for="avatar-upload" class="avatar-upload-label">Upload</label>
         <input type="file" id="avatar-upload" accept="image/jpeg, image/png">
+        <!-- Reset avatar -->
+        <button id="avatar-reset" class="avatar-reset-btn">Reset</button>
     </div>
 
     <h1 class="profile-username">Username</h1>
@@ -18,6 +21,9 @@
         <button id="edit-profile-btn" class="edit-profile-btn">Edit Profile</button>
         <button id="profile-view-match-history-btn">View Match History</button>
         <button id="profile-logout-btn">Logout</button>
+        <button id="anonymize-personal-data-btn" class="anonymize-personal-data-btn">
+          <i class="fas fa-user-slash"></i> Anonymize Personal Data
+        </button>
         <button id="deactivate-account-btn" class="deactivate-account-btn">
             <i class="fas fa-user-slash"></i> Deactivate Account
         </button>

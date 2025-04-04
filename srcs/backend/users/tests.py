@@ -343,7 +343,7 @@ class TestUpdatePassword(BaseTestCase):
 )  # Uploaded test files are removed on container removal
 class TestUpdateAvatar(BaseTestCase):
     def setUp(self):
-        self.url = reverse("users:update_avatar", args=[self.user.id])
+        self.url = reverse("users:handle_avatar", args=[self.user.id])
         self.login()
 
     def make_request(self, request_body={}):
@@ -426,6 +426,45 @@ class TestUpdateAvatar(BaseTestCase):
         self.assertEqual(
             data["errors"]["avatar"],
             ["File size exceeds the limit 3.0 MB."],
+        )
+
+
+class TestAnonymizeUser(BaseTestCase):
+    def setUp(self):
+        self.url = reverse("users:anonymize_user", args=[self.user.id])
+
+    def test_anonymize_user(self):
+        self.login()
+
+        response = self.client.patch(self.url)
+        self.user.refresh_from_db()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(
+            response.content,
+            {"message": "Your data has been anonymized. Logging out..."},
+        )
+
+        self.assertTrue(self.user.is_anonymized)
+        self.assertNotEqual(self.user.username, "testuser")
+        self.assertNotEqual(self.user.email, "testuser@example.com")
+        self.assertFalse(self.user.has_usable_password())
+
+        # Check the user is logged out (session cookie marked for deletion)
+        session_cookie = self.client.cookies.get(f"session_{self.user.id}")
+        self.assertIsNotNone(session_cookie)
+        self.assertEqual(session_cookie.value, "")  # Session should be cleared
+        self.assertEqual(session_cookie["expires"], "Thu, 01 Jan 1970 00:00:00 GMT")
+
+    def test_anonymize_already_anonymized_user(self):
+        self.user.anonymize()
+        self.login()
+
+        response = self.client.patch(self.url)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONEqual(
+            response.content, {"errors": "User is already anonymized."}
         )
 
 
