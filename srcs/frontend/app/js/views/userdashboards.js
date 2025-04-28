@@ -6,9 +6,19 @@ const setupUserDashboardJs = async () => {
 
         console.log(`📊 Loading User Stats | Section: ${section.toUpperCase()}`);
 
+        populateUserSelect();
         switch (section) {
             case "overview":
-                initializeUserOverview();
+                document.getElementById("loadStatsBtn").addEventListener("click", () => {
+                      const userId = document.getElementById("userSelect").value;
+
+                      if (!userId) {
+                        alert("Please select a user.");
+                        return;
+                      }
+
+                      initializeUserOverview(userId);
+                    });
                 break;
             case "history":
                 initializeMatchHistory();

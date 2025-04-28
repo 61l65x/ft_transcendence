@@ -1,11 +1,13 @@
-async function initializeUserOverview() {
+async function initializeUserOverview(userId, username) {
   try {
-    const userId = localStorage.getItem("user_id");
-    const [user, matchData] = await Promise.all([
-      apiRequest(`users/${userId}/`, "GET"),
-      apiRequest(`users/${userId}/match-history/`, "GET"),
-    ]);
+    const userList = getLoggedInUsers();
+    const user = userList.find(u => u.id.toString() === userId.toString());
 
+    if (!user) {
+      console.error("User not found in localStorage");
+      return;
+    }
+    const matchData = await apiRequest(`users/${userId}/match-history/`, "GET");
     const matches = Array.isArray(matchData.match_history) ? matchData.match_history : [];
     const totalMatches = matches.length;
     console.log("📦 match history raw response:", matches);
@@ -61,6 +63,65 @@ function renderWinLossChart(matches, username, containerId) {
         backgroundColor: ["#4caf50", "#f44336"]
       }]
     }
+  });
+}
+
+function getLoggedInUsers() {
+  return JSON.parse(localStorage.getItem("loggedInUsers") || "[]");
+}
+
+function setupUserStatsSelector() {
+  const userList = getLoggedInUsers();
+  console.log(getLoggedInUsers());
+  const select = document.getElementById("user-select");
+
+  // Empty select
+  select.innerHTML = "";
+
+  if (!userList.length) {
+    select.innerHTML = `<option>No logged-in users found</option>`;
+    return;
+  }
+
+  userList.forEach(user => {
+    const option = document.createElement("option");
+    option.value = user.id;
+    option.textContent = user.username;
+    select.appendChild(option);
+  });
+
+  document.getElementById("load-user-stats-btn").addEventListener("click", () => {
+    const selectedId = select.value;
+    const selectedUser = userList.find(u => u.id == selectedId);
+    if (selectedUser) {
+      initializeUserOverview(selectedUser.id, selectedUser.username);
+    }
+  });
+}
+
+// document.addEventListener("DOMContentLoaded", () => {
+//   console.log("🧠 DOM ready");
+//   populateUserSelect();
+// });
+
+
+function populateUserSelect() {
+  const users = getLoggedInUsers();
+  const select = document.getElementById("userSelect");
+
+  if (!select) {
+    console.error("❌ Select element not found");
+    return;
+  }
+  if (!users || users.length === 0) {
+    console.warn("⚠️ No users found");
+    return;
+  }
+  users.forEach(user => {
+    const option = document.createElement("option");
+    option.value = user.id;
+    option.textContent = user.username;
+    select.appendChild(option);
   });
 }
 

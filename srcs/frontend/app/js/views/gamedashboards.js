@@ -7,9 +7,19 @@ const setupGameDashboardJs = async () => {
 
         console.log(`📈 Loading Game Stats | Section:: ${section.toUpperCase()}`);
 
+        populateUserSelectGame();
         switch (section) {
             case "overview":
-                initializeGameStatsOverview();
+                document.getElementById("loadStatsBtnGame").addEventListener("click", () => {
+                      const userId = document.getElementById("userSelectGame").value;
+
+                      if (!userId) {
+                        alert("Please select a user.");
+                        return;
+                      }
+
+                      initializeGameStatsOverview(userId);
+                    });
                 break;
             // case "matches":
             //     initializeGameHistory();
